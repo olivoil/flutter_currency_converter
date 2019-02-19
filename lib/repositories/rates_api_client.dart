@@ -20,8 +20,6 @@ class RatesApiClient {
       throw Exception('error getting exchange rates');
     }
 
-    print(res.body);
-    print(json.decode(res.body));
     return serializers.deserializeWith(Rate.serializer, json.decode(res.body));
   }
 }

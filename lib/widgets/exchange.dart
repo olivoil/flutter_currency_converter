@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:currency/blocs/blocs.dart';
+import 'package:currency/models/models.dart';
 
 class Exchange extends StatelessWidget {
   @override
@@ -34,25 +35,29 @@ class Exchange extends StatelessWidget {
                         children: <Widget>[
                           SizedBox(height: 30.0),
                           InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(
-                                  CupertinoPageRoute(
-                                    builder: (context) => CurrencyList(
-                                            onCurrencySelected:
-                                                (String symbol) {
-                                          bloc.dispatch(
-                                              SetCurrencyA(symbol: symbol));
-                                        }),
-                                  ),
-                                );
-                              },
-                              child: Text(
-                                state.currencyA,
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 22.0,
-                                    fontFamily: 'Quicksand'),
-                              )),
+                            onTap: () {
+                              Navigator.of(context).push(
+                                CupertinoPageRoute(
+                                  builder: (context) => CurrencyList(
+                                        onCurrencySelected: (String symbol) {
+                                          bloc.dispatch(SetAmountA(
+                                              amount: Amount((b) => b
+                                                ..value = state.amountA.value
+                                                ..currency = symbol)));
+                                        },
+                                      ),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              Currency.lookup(state.amountA.currency).name,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22.0,
+                                  fontFamily: 'Quicksand'),
+                            ),
+                          ),
+                          SizedBox(height: 20.0),
                         ],
                       ),
                     ),

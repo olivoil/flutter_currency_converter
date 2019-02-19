@@ -14,10 +14,8 @@ abstract class ExchangeState extends Equatable {
 
   ExchangeState set({
     Rate rate,
-    String currencyA,
-    String currencyB,
-    double amountA,
-    double amountB,
+    Amount amountA,
+    Amount amountB,
     bool reverse,
   });
 
@@ -27,26 +25,23 @@ abstract class ExchangeState extends Equatable {
 }
 
 class ExchangeUninitialized extends ExchangeState {
-  final String currencyA;
-  final String currencyB;
-  final double amountA;
-  final double amountB;
+  final Amount amountA;
+  final Amount amountB;
   final bool reverse;
 
   ExchangeUninitialized({
-    this.currencyA = 'USD',
-    this.currencyB = 'MXN',
-    this.amountA = 0.0,
-    this.amountB = 0.0,
-    this.reverse = false,
-  }) : super([currencyA, currencyB, amountA, amountB, reverse]);
+    Amount amountA,
+    Amount amountB,
+    bool reverse,
+  })  : amountA = amountA == null ? Amount.zero('USD') : amountA,
+        amountB = amountB == null ? Amount.zero('MXN') : amountB,
+        reverse = reverse == null ? false : reverse,
+        super([amountA, amountB, reverse]);
 
   @override
   ExchangeLoaded refreshRate({Rate rate}) {
     return ExchangeLoaded(
       rate: rate,
-      currencyA: this.currencyA,
-      currencyB: this.currencyB,
       amountA: this.amountA,
       amountB: this.amountB,
       reverse: this.reverse,
@@ -56,17 +51,13 @@ class ExchangeUninitialized extends ExchangeState {
   @override
   ExchangeState set({
     Rate rate,
-    String currencyA,
-    String currencyB,
-    double amountA,
-    double amountB,
+    Amount amountA,
+    Amount amountB,
     bool reverse,
   }) {
     if (rate != null) {
       return ExchangeLoaded(
         rate: rate,
-        currencyA: currencyA == null ? this.currencyA : currencyA,
-        currencyB: currencyB == null ? this.currencyB : currencyB,
         amountA: amountA == null ? this.amountA : amountA,
         amountB: amountB == null ? this.amountB : amountB,
         reverse: reverse == null ? this.reverse : reverse,
@@ -74,8 +65,6 @@ class ExchangeUninitialized extends ExchangeState {
     }
 
     return ExchangeUninitialized(
-      currencyA: currencyA == null ? this.currencyA : currencyA,
-      currencyB: currencyB == null ? this.currencyB : currencyB,
       amountA: amountA == null ? this.amountA : amountA,
       amountB: amountB == null ? this.amountB : amountB,
       reverse: reverse == null ? this.reverse : reverse,
@@ -88,42 +77,44 @@ class ExchangeUninitialized extends ExchangeState {
 
 class ExchangeLoaded extends ExchangeState {
   final Rate rate;
-  final String currencyA;
-  final String currencyB;
-  final double amountA;
-  final double amountB;
+  final Amount amountA;
+  final Amount amountB;
   final bool reverse;
 
   ExchangeLoaded({
     @required this.rate,
-    @required this.currencyA,
-    @required this.currencyB,
-    amountA,
-    amountB,
+    @required amountA,
+    @required amountB,
     @required this.reverse,
-  })  : assert(reverse ? amountB != null : amountA != null),
-        assert(rate.rates.keys.contains(currencyA)),
-        assert(rate.rates.keys.contains(currencyB)),
+  })  : assert(reverse ? amountB.value != null : amountA.value != null),
+        assert(rate.rates.keys.contains(amountA.currency)),
+        assert(rate.rates.keys.contains(amountB.currency)),
         amountA = reverse
             ? _applyRate(
-                rate: rate, from: currencyB, to: currencyA, amount: amountB)
+                rate: rate,
+                from: amountB.currency,
+                to: amountA.currency,
+                amount: amountB.value)
             : amountA,
         amountB = reverse
             ? amountB
             : _applyRate(
-                rate: rate, from: currencyA, to: currencyB, amount: amountA),
-        super([currencyA, currencyB, amountA, amountB, reverse]);
+                rate: rate,
+                from: amountA.currency,
+                to: amountB.currency,
+                amount: amountA.value),
+        super([amountA, amountB, reverse]);
 
-  static double _applyRate({Rate rate, String from, String to, double amount}) {
-    return (amount / rate.rates[from]) * rate.rates[to];
+  static Amount _applyRate({Rate rate, String from, String to, double amount}) {
+    return Amount((b) => b
+      ..currency = to
+      ..value = (amount / rate.rates[from]) * rate.rates[to]);
   }
 
   @override
   ExchangeLoaded refreshRate({Rate rate}) {
     return ExchangeLoaded(
       rate: rate,
-      currencyA: this.currencyA,
-      currencyB: this.currencyB,
       amountA: this.amountA,
       amountB: this.amountB,
       reverse: this.reverse,
@@ -133,16 +124,12 @@ class ExchangeLoaded extends ExchangeState {
   @override
   ExchangeState set({
     Rate rate,
-    String currencyA,
-    String currencyB,
-    double amountA,
-    double amountB,
+    Amount amountA,
+    Amount amountB,
     bool reverse,
   }) {
     return ExchangeLoaded(
       rate: rate == null ? this.rate : rate,
-      currencyA: currencyA == null ? this.currencyA : currencyA,
-      currencyB: currencyB == null ? this.currencyB : currencyB,
       amountA: amountA == null ? this.amountA : amountA,
       amountB: amountB == null ? this.amountB : amountB,
       reverse: reverse == null ? this.reverse : reverse,
@@ -151,8 +138,8 @@ class ExchangeLoaded extends ExchangeState {
 
   @override
   String toString() => reverse
-      ? 'ExchangeLoaded { from: { curreny: $currencyB, amount: $amountB }, to: { currency: $currencyA, amount: $amountA } }'
-      : 'ExchangeLoaded { from: { curreny: $currencyA, amount: $amountA }, to: { currency: $currencyB, amount: $amountB } }';
+      ? 'ExchangeLoaded { from: $amountB, to: $amountA } }'
+      : 'ExchangeLoaded { from: $amountA, to: $amountB } }';
 }
 
 class ExchangeError extends ExchangeState {
@@ -163,16 +150,12 @@ class ExchangeError extends ExchangeState {
   @override
   ExchangeState set({
     Rate rate,
-    String currencyA,
-    String currencyB,
-    double amountA,
-    double amountB,
+    Amount amountA,
+    Amount amountB,
     bool reverse,
   }) {
     return this.reset().set(
           rate: rate,
-          currencyA: currencyA,
-          currencyB: currencyB,
           amountA: amountA,
           amountB: amountB,
           reverse: reverse,
@@ -189,26 +172,14 @@ abstract class ExchangeEvent extends Equatable {
 
 class RefreshRates extends ExchangeEvent {}
 
-class SetCurrencyA extends ExchangeEvent {
-  final String symbol;
-
-  SetCurrencyA({@required this.symbol}) : super([symbol]);
-}
-
-class SetCurrencyB extends ExchangeEvent {
-  final String symbol;
-
-  SetCurrencyB({@required this.symbol}) : super([symbol]);
-}
-
 class SetAmountA extends ExchangeEvent {
-  final double amount;
+  final Amount amount;
 
   SetAmountA({@required this.amount}) : super([amount]);
 }
 
 class SetAmountB extends ExchangeEvent {
-  final double amount;
+  final Amount amount;
 
   SetAmountB({@required this.amount}) : super([amount]);
 }
@@ -236,16 +207,6 @@ class ExchangeBloc extends Bloc<ExchangeEvent, ExchangeState> {
       } catch (e) {
         yield ExchangeError(error: e.toString());
       }
-    }
-
-    if (event is SetCurrencyA) {
-      yield currentState.set(currencyA: event.symbol);
-      this.dispatch(RefreshRates());
-    }
-
-    if (event is SetCurrencyB) {
-      yield currentState.set(currencyB: event.symbol);
-      this.dispatch(RefreshRates());
     }
 
     if (event is SetAmountA) {

@@ -1,11 +1,10 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:currency/blocs/blocs.dart';
+import 'package:currency/models/models.dart';
 import 'package:currency/widgets/exchange.dart';
 
 typedef void CurrencySelectedCallback(String symbol);
@@ -41,39 +40,31 @@ class CurrencyListState extends State<CurrencyList> {
         ),
       ),
       body: BlocBuilder(
-          bloc: bloc,
-          builder: (BuildContext context, ExchangeState state) {
-            return FutureBuilder(
-              future: DefaultAssetBundle.of(context)
-                  .loadString("assets/currencies.json"),
-              builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                if (state is ExchangeLoaded) {
-                  return ListView.builder(
-                    padding: EdgeInsets.only(left: 25.0),
-                    itemExtent: 40.0,
-                    itemCount: state.rate.rates.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final String symbol =
-                          state.rate.rates.keys.elementAt(index);
-                      final currencies = json.decode(snapshot.data);
-                      return _buildCurrencyItem(
-                          context, symbol, currencies[symbol]);
-                    },
-                  );
-                }
-
-                bloc.dispatch(RefreshRates());
-                return Container();
+        bloc: bloc,
+        builder: (BuildContext context, ExchangeState state) {
+          if (state is ExchangeLoaded) {
+            return ListView.builder(
+              padding: EdgeInsets.only(left: 25.0),
+              itemExtent: 40.0,
+              itemCount: state.rate.rates.length,
+              itemBuilder: (BuildContext context, int index) {
+                final String symbol = state.rate.rates.keys.elementAt(index);
+                return _buildCurrencyItem(context, Currency.lookup(symbol));
               },
             );
-          }),
+          }
+
+          bloc.dispatch(RefreshRates());
+          return Container();
+        },
+      ),
     );
   }
 
-  Widget _buildCurrencyItem(BuildContext context, String symbol, String name) {
+  Widget _buildCurrencyItem(BuildContext context, Currency currency) {
     return InkWell(
       onTap: () {
-        widget.onCurrencySelected(symbol);
+        widget.onCurrencySelected(currency.symbol);
 
         Navigator.of(context).pushReplacement(
           CupertinoPageRoute(
@@ -86,7 +77,7 @@ class CurrencyListState extends State<CurrencyList> {
           Container(
             width: MediaQuery.of(context).size.width * .25,
             child: Text(
-              symbol,
+              currency.symbol,
               style: TextStyle(
                 fontFamily: 'Quicksand',
                 fontSize: 25.0,
@@ -96,7 +87,7 @@ class CurrencyListState extends State<CurrencyList> {
             ),
           ),
           Text(
-            name,
+            currency.name,
             style: TextStyle(
               fontFamily: 'Quicksand',
               fontSize: 25.0,

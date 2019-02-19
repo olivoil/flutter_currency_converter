@@ -7,6 +7,8 @@ part of 'serializers.dart';
 // **************************************************************************
 
 Serializers _$serializers = (new Serializers().toBuilder()
+      ..add(Amount.serializer)
+      ..add(Currency.serializer)
       ..add(Rate.serializer)
       ..addBuilderFactory(
           const FullType(
