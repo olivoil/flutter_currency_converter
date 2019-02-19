@@ -1,5 +1,3 @@
-# currency
-
 A minimal currency converter created with Flutter.
 
 ## Credits
