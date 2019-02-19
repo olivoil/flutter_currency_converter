@@ -1,16 +1,18 @@
 # currency
 
-A new Flutter project.
+A minimal currency converter created with Flutter.
 
-## Getting Started
+## Credits
 
-This project is a starting point for a Flutter application.
+### Inspiration
 
-A few resources to get you started if this is your first Flutter project:
+- idea for the app taken from https://github.com/rajayogan/flutterui-minimalapps
+- design from https://dribbble.com/shots/4816296-Stylish-Currency-Converter-iOS-app
 
-- [Lab: Write your first Flutter app](https://flutter.io/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.io/docs/cookbook)
+### Implementation
 
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.io/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+- state management implemented using [flutter_bloc](https://pub.dartlang.org/packages/flutter_bloc)
+- api implemented using https://exchangeratesapi.io/
+
+## Screenshots
+
