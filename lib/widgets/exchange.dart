@@ -1,4 +1,5 @@
 import 'package:currency/widgets/currency_list.dart';
+import 'package:currency/widgets/input_amount_value.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -29,11 +30,11 @@ class Exchange extends StatelessWidget {
                     width: MediaQuery.of(context).size.width,
                     color: Color(0xFFEC5759),
                   ),
-                  Container(
+                  SafeArea(
                     child: Center(
                       child: Column(
                         children: <Widget>[
-                          SizedBox(height: 30.0),
+                          SizedBox(height: 10.0),
                           InkWell(
                             onTap: () {
                               Navigator.of(context).push(
@@ -58,6 +59,32 @@ class Exchange extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 20.0),
+                          InkWell(
+                              onTap: () {
+                                Navigator.of(context)
+                                    .pushReplacement(MaterialPageRoute(
+                                        builder: (context) => InputAmountValue(
+                                              backgroundColor:
+                                                  Color(0xFFEC5759),
+                                              valueColor: Colors.white,
+                                              textColor: Color(0xFFF1ABAB),
+                                              onAmountSelected: (double value) {
+                                                bloc.dispatch(SetAmountA(
+                                                  amount: Amount((b) => b
+                                                    ..value = value
+                                                    ..currency =
+                                                        state.amountA.currency),
+                                                ));
+                                              },
+                                            )));
+                              },
+                              child: Text(
+                                state.amountA.value.toString(),
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 120.0,
+                                    fontFamily: 'Quicksand'),
+                              )),
                         ],
                       ),
                     ),
