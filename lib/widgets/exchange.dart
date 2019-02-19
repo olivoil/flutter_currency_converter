@@ -9,9 +9,11 @@ import 'package:currency/blocs/blocs.dart';
 class Exchange extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    ExchangeBloc bloc = BlocProvider.of<ExchangeBloc>(context);
+
     return Material(
       child: BlocBuilder(
-          bloc: BlocProvider.of<ExchangeBloc>(context),
+          bloc: bloc,
           builder: (BuildContext context, ExchangeState state) {
             if (state is ExchangeLoaded) {
               return Stack(
@@ -33,10 +35,16 @@ class Exchange extends StatelessWidget {
                           SizedBox(height: 30.0),
                           InkWell(
                               onTap: () {
-                                Navigator.of(context).push(CupertinoPageRoute(
+                                Navigator.of(context).push(
+                                  CupertinoPageRoute(
                                     builder: (context) => CurrencyList(
-                                          isCurrencyA: true,
-                                        )));
+                                            onCurrencySelected:
+                                                (String symbol) {
+                                          bloc.dispatch(
+                                              SetCurrencyA(symbol: symbol));
+                                        }),
+                                  ),
+                                );
                               },
                               child: Text(
                                 state.currencyA,

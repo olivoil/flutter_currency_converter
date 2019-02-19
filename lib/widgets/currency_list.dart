@@ -8,11 +8,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:currency/blocs/blocs.dart';
 import 'package:currency/widgets/exchange.dart';
 
-class CurrencyList extends StatefulWidget {
-  final bool isCurrencyA;
+typedef void CurrencySelectedCallback(String symbol);
 
-  CurrencyList({Key key, @required this.isCurrencyA})
-      : assert(isCurrencyA != null),
+class CurrencyList extends StatefulWidget {
+  final CurrencySelectedCallback onCurrencySelected;
+
+  CurrencyList({Key key, @required this.onCurrencySelected})
+      : assert(onCurrencySelected != null),
         super(key: key);
 
   @override
@@ -69,15 +71,9 @@ class CurrencyListState extends State<CurrencyList> {
   }
 
   Widget _buildCurrencyItem(BuildContext context, String symbol, String name) {
-    ExchangeBloc bloc = BlocProvider.of<ExchangeBloc>(context);
-
     return InkWell(
       onTap: () {
-        if (widget.isCurrencyA) {
-          bloc.dispatch(SetCurrencyA(symbol: symbol));
-        } else {
-          bloc.dispatch(SetCurrencyB(symbol: symbol));
-        }
+        widget.onCurrencySelected(symbol);
 
         Navigator.of(context).pushReplacement(
           CupertinoPageRoute(
