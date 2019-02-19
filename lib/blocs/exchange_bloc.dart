@@ -14,8 +14,8 @@ abstract class ExchangeState extends Equatable {
 
   ExchangeState set({
     Rate rate,
-    Amount amountA,
-    Amount amountB,
+    Value valueA,
+    Value valueB,
     bool reverse,
   });
 
@@ -25,29 +25,29 @@ abstract class ExchangeState extends Equatable {
 }
 
 class ExchangeUninitialized extends ExchangeState {
-  final Amount amountA;
-  final Amount amountB;
+  final Value valueA;
+  final Value valueB;
   final bool reverse;
 
   ExchangeUninitialized({
-    Amount amountA,
-    Amount amountB,
+    Value valueA,
+    Value valueB,
     bool reverse,
-  })  : amountA = amountA == null ? Amount.zero('USD') : amountA,
-        amountB = amountB == null ? Amount.zero('MXN') : amountB,
+  })  : valueA = valueA == null ? Value.zero('USD') : valueA,
+        valueB = valueB == null ? Value.zero('MXN') : valueB,
         reverse = reverse == null ? false : reverse,
-        super([amountA, amountB, reverse]);
+        super([valueA, valueB, reverse]);
 
   @override
   ExchangeLoaded refreshRate({Rate rate}) {
     return ExchangeLoaded(
       rate: rate,
-      amountA: this.amountA.value == 0.0
-          ? Amount((b) => b
-            ..value = 1.0
-            ..currency = this.amountA.currency)
-          : this.amountA,
-      amountB: this.amountB,
+      valueA: this.valueA.amount == 0.0
+          ? Value((b) => b
+            ..amount = 1.0
+            ..currency = this.valueA.currency)
+          : this.valueA,
+      valueB: this.valueB,
       reverse: this.reverse,
     );
   }
@@ -55,22 +55,22 @@ class ExchangeUninitialized extends ExchangeState {
   @override
   ExchangeState set({
     Rate rate,
-    Amount amountA,
-    Amount amountB,
+    Value valueA,
+    Value valueB,
     bool reverse,
   }) {
     if (rate != null) {
       return ExchangeLoaded(
         rate: rate,
-        amountA: amountA == null ? this.amountA : amountA,
-        amountB: amountB == null ? this.amountB : amountB,
+        valueA: valueA == null ? this.valueA : valueA,
+        valueB: valueB == null ? this.valueB : valueB,
         reverse: reverse == null ? this.reverse : reverse,
       );
     }
 
     return ExchangeUninitialized(
-      amountA: amountA == null ? this.amountA : amountA,
-      amountB: amountB == null ? this.amountB : amountB,
+      valueA: valueA == null ? this.valueA : valueA,
+      valueB: valueB == null ? this.valueB : valueB,
       reverse: reverse == null ? this.reverse : reverse,
     );
   }
@@ -81,46 +81,46 @@ class ExchangeUninitialized extends ExchangeState {
 
 class ExchangeLoaded extends ExchangeState {
   final Rate rate;
-  final Amount amountA;
-  final Amount amountB;
+  final Value valueA;
+  final Value valueB;
   final bool reverse;
 
   ExchangeLoaded({
     @required this.rate,
-    @required amountA,
-    @required amountB,
+    @required valueA,
+    @required valueB,
     @required this.reverse,
-  })  : assert(reverse ? amountB.value != null : amountA.value != null),
-        assert(rate.rates.keys.contains(amountA.currency)),
-        assert(rate.rates.keys.contains(amountB.currency)),
-        amountA = reverse
+  })  : assert(reverse ? valueB.amount != null : valueA.amount != null),
+        assert(rate.rates.keys.contains(valueA.currency)),
+        assert(rate.rates.keys.contains(valueB.currency)),
+        valueA = reverse
             ? _applyRate(
                 rate: rate,
-                from: amountB.currency,
-                to: amountA.currency,
-                amount: amountB.value)
-            : amountA,
-        amountB = reverse
-            ? amountB
+                from: valueB.currency,
+                to: valueA.currency,
+                amount: valueB.amount)
+            : valueA,
+        valueB = reverse
+            ? valueB
             : _applyRate(
                 rate: rate,
-                from: amountA.currency,
-                to: amountB.currency,
-                amount: amountA.value),
-        super([amountA, amountB, reverse]);
+                from: valueA.currency,
+                to: valueB.currency,
+                amount: valueA.amount),
+        super([valueA, valueB, reverse]);
 
-  static Amount _applyRate({Rate rate, String from, String to, double amount}) {
-    return Amount((b) => b
+  static Value _applyRate({Rate rate, String from, String to, double amount}) {
+    return Value((b) => b
       ..currency = to
-      ..value = (amount / rate.rates[from]) * rate.rates[to]);
+      ..amount = (amount / rate.rates[from]) * rate.rates[to]);
   }
 
   @override
   ExchangeLoaded refreshRate({Rate rate}) {
     return ExchangeLoaded(
       rate: rate,
-      amountA: this.amountA,
-      amountB: this.amountB,
+      valueA: this.valueA,
+      valueB: this.valueB,
       reverse: this.reverse,
     );
   }
@@ -128,22 +128,22 @@ class ExchangeLoaded extends ExchangeState {
   @override
   ExchangeState set({
     Rate rate,
-    Amount amountA,
-    Amount amountB,
+    Value valueA,
+    Value valueB,
     bool reverse,
   }) {
     return ExchangeLoaded(
       rate: rate == null ? this.rate : rate,
-      amountA: amountA == null ? this.amountA : amountA,
-      amountB: amountB == null ? this.amountB : amountB,
+      valueA: valueA == null ? this.valueA : valueA,
+      valueB: valueB == null ? this.valueB : valueB,
       reverse: reverse == null ? this.reverse : reverse,
     );
   }
 
   @override
   String toString() => reverse
-      ? 'ExchangeLoaded { from: $amountB, to: $amountA } }'
-      : 'ExchangeLoaded { from: $amountA, to: $amountB } }';
+      ? 'ExchangeLoaded { from: $valueB, to: $valueA } }'
+      : 'ExchangeLoaded { from: $valueA, to: $valueB } }';
 }
 
 class ExchangeError extends ExchangeState {
@@ -154,14 +154,14 @@ class ExchangeError extends ExchangeState {
   @override
   ExchangeState set({
     Rate rate,
-    Amount amountA,
-    Amount amountB,
+    Value valueA,
+    Value valueB,
     bool reverse,
   }) {
     return this.reset().set(
           rate: rate,
-          amountA: amountA,
-          amountB: amountB,
+          valueA: valueA,
+          valueB: valueB,
           reverse: reverse,
         );
   }
@@ -176,19 +176,19 @@ abstract class ExchangeEvent extends Equatable {
 
 class RefreshRates extends ExchangeEvent {}
 
-class SetAmountA extends ExchangeEvent {
-  final Amount amount;
+class SetValueA extends ExchangeEvent {
+  final Value value;
 
-  SetAmountA({@required this.amount}) : super([amount]);
+  SetValueA({@required this.value}) : super([value]);
 }
 
-class SetAmountB extends ExchangeEvent {
-  final Amount amount;
+class SetValueB extends ExchangeEvent {
+  final Value value;
 
-  SetAmountB({@required this.amount}) : super([amount]);
+  SetValueB({@required this.value}) : super([value]);
 }
 
-class ToggleReverse extends ExchangeEvent {}
+// class ToggleReverse extends ExchangeEvent {}
 
 class ExchangeBloc extends Bloc<ExchangeEvent, ExchangeState> {
   final RatesRepository ratesRepository;
@@ -213,29 +213,29 @@ class ExchangeBloc extends Bloc<ExchangeEvent, ExchangeState> {
       }
     }
 
-    if (event is SetAmountA) {
-      yield currentState.set(amountA: event.amount);
+    if (event is SetValueA) {
+      yield currentState.set(valueA: event.value);
       this.dispatch(RefreshRates());
     }
 
-    if (event is SetAmountB) {
-      yield currentState.set(amountB: event.amount);
+    if (event is SetValueB) {
+      yield currentState.set(valueB: event.value);
       this.dispatch(RefreshRates());
     }
 
-    if (event is ToggleReverse) {
-      if (currentState is ExchangeError) {
-        ExchangeUninitialized state = currentState.reset();
-        yield state.set(reverse: !state.reverse);
-      }
+    // if (event is ToggleReverse) {
+    //   if (currentState is ExchangeError) {
+    //     ExchangeUninitialized state = currentState.reset();
+    //     yield state.set(reverse: !state.reverse);
+    //   }
 
-      if (currentState is ExchangeUninitialized) {
-        yield currentState.set(reverse: !currentState.reverse);
-      }
+    //   if (currentState is ExchangeUninitialized) {
+    //     yield currentState.set(reverse: !currentState.reverse);
+    //   }
 
-      if (currentState is ExchangeLoaded) {
-        yield currentState.set(reverse: !currentState.reverse);
-      }
-    }
+    //   if (currentState is ExchangeLoaded) {
+    //     yield currentState.set(reverse: !currentState.reverse);
+    //   }
+    // }
   }
 }

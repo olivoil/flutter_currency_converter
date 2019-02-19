@@ -74,9 +74,9 @@ class Exchange extends StatelessWidget {
                                 CupertinoPageRoute(
                                   builder: (context) => CurrencyList(
                                         onCurrencySelected: (String symbol) {
-                                          bloc.dispatch(SetAmountA(
-                                              amount: Amount((b) => b
-                                                ..value = state.amountA.value
+                                          bloc.dispatch(SetValueA(
+                                              value: Value((b) => b
+                                                ..amount = state.valueA.amount
                                                 ..currency = symbol)));
                                         },
                                       ),
@@ -84,7 +84,7 @@ class Exchange extends StatelessWidget {
                               );
                             },
                             child: Text(
-                              Currency.lookup(state.amountA.currency).name,
+                              Currency.lookup(state.valueA.currency).name,
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 22.0,
@@ -100,19 +100,18 @@ class Exchange extends StatelessWidget {
                                       backgroundColor: Color(0xFFEC5759),
                                       valueColor: Colors.white,
                                       textColor: Color(0xFFF1ABAB),
-                                      onAmountSelected: (double value) {
-                                        bloc.dispatch(SetAmountA(
-                                          amount: Amount((b) => b
-                                            ..value = value
-                                            ..currency =
-                                                state.amountA.currency),
+                                      onAmountSelected: (double amount) {
+                                        bloc.dispatch(SetValueA(
+                                          value: Value((b) => b
+                                            ..amount = amount
+                                            ..currency = state.valueA.currency),
                                         ));
                                       },
                                     ),
                               ));
                             },
                             child: Text(
-                              formatNumber(state.amountA.value),
+                              formatNumber(state.valueA.amount),
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 120.0,
@@ -121,7 +120,7 @@ class Exchange extends StatelessWidget {
                           ),
                           SizedBox(height: 20.0),
                           Text(
-                            state.amountA.currency,
+                            state.valueA.currency,
                             style: TextStyle(
                                 color: Color(0xFFFFB6B6),
                                 fontSize: 17.0,

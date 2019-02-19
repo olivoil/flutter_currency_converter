@@ -1,25 +1,25 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'amount.dart';
+part of 'value.dart';
 
 // **************************************************************************
 // BuiltValueGenerator
 // **************************************************************************
 
-Serializer<Amount> _$amountSerializer = new _$AmountSerializer();
+Serializer<Value> _$valueSerializer = new _$ValueSerializer();
 
-class _$AmountSerializer implements StructuredSerializer<Amount> {
+class _$ValueSerializer implements StructuredSerializer<Value> {
   @override
-  final Iterable<Type> types = const [Amount, _$Amount];
+  final Iterable<Type> types = const [Value, _$Value];
   @override
-  final String wireName = 'Amount';
+  final String wireName = 'Value';
 
   @override
-  Iterable serialize(Serializers serializers, Amount object,
+  Iterable serialize(Serializers serializers, Value object,
       {FullType specifiedType = FullType.unspecified}) {
     final result = <Object>[
-      'value',
-      serializers.serialize(object.value,
+      'amount',
+      serializers.serialize(object.amount,
           specifiedType: const FullType(double)),
       'currency',
       serializers.serialize(object.currency,
@@ -30,9 +30,9 @@ class _$AmountSerializer implements StructuredSerializer<Amount> {
   }
 
   @override
-  Amount deserialize(Serializers serializers, Iterable serialized,
+  Value deserialize(Serializers serializers, Iterable serialized,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = new AmountBuilder();
+    final result = new ValueBuilder();
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
@@ -40,8 +40,8 @@ class _$AmountSerializer implements StructuredSerializer<Amount> {
       iterator.moveNext();
       final dynamic value = iterator.current;
       switch (key) {
-        case 'value':
-          result.value = serializers.deserialize(value,
+        case 'amount':
+          result.amount = serializers.deserialize(value,
               specifiedType: const FullType(double)) as double;
           break;
         case 'currency':
@@ -55,69 +55,69 @@ class _$AmountSerializer implements StructuredSerializer<Amount> {
   }
 }
 
-class _$Amount extends Amount {
+class _$Value extends Value {
   @override
-  final double value;
+  final double amount;
   @override
   final String currency;
 
-  factory _$Amount([void updates(AmountBuilder b)]) =>
-      (new AmountBuilder()..update(updates)).build();
+  factory _$Value([void updates(ValueBuilder b)]) =>
+      (new ValueBuilder()..update(updates)).build();
 
-  _$Amount._({this.value, this.currency}) : super._() {
-    if (value == null) {
-      throw new BuiltValueNullFieldError('Amount', 'value');
+  _$Value._({this.amount, this.currency}) : super._() {
+    if (amount == null) {
+      throw new BuiltValueNullFieldError('Value', 'amount');
     }
     if (currency == null) {
-      throw new BuiltValueNullFieldError('Amount', 'currency');
+      throw new BuiltValueNullFieldError('Value', 'currency');
     }
   }
 
   @override
-  Amount rebuild(void updates(AmountBuilder b)) =>
+  Value rebuild(void updates(ValueBuilder b)) =>
       (toBuilder()..update(updates)).build();
 
   @override
-  AmountBuilder toBuilder() => new AmountBuilder()..replace(this);
+  ValueBuilder toBuilder() => new ValueBuilder()..replace(this);
 
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is Amount &&
-        value == other.value &&
+    return other is Value &&
+        amount == other.amount &&
         currency == other.currency;
   }
 
   @override
   int get hashCode {
-    return $jf($jc($jc(0, value.hashCode), currency.hashCode));
+    return $jf($jc($jc(0, amount.hashCode), currency.hashCode));
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('Amount')
-          ..add('value', value)
+    return (newBuiltValueToStringHelper('Value')
+          ..add('amount', amount)
           ..add('currency', currency))
         .toString();
   }
 }
 
-class AmountBuilder implements Builder<Amount, AmountBuilder> {
-  _$Amount _$v;
+class ValueBuilder implements Builder<Value, ValueBuilder> {
+  _$Value _$v;
 
-  double _value;
-  double get value => _$this._value;
-  set value(double value) => _$this._value = value;
+  double _amount;
+  double get amount => _$this._amount;
+  set amount(double amount) => _$this._amount = amount;
 
   String _currency;
   String get currency => _$this._currency;
   set currency(String currency) => _$this._currency = currency;
 
-  AmountBuilder();
+  ValueBuilder();
 
-  AmountBuilder get _$this {
+  ValueBuilder get _$this {
     if (_$v != null) {
-      _value = _$v.value;
+      _amount = _$v.amount;
       _currency = _$v.currency;
       _$v = null;
     }
@@ -125,21 +125,21 @@ class AmountBuilder implements Builder<Amount, AmountBuilder> {
   }
 
   @override
-  void replace(Amount other) {
+  void replace(Value other) {
     if (other == null) {
       throw new ArgumentError.notNull('other');
     }
-    _$v = other as _$Amount;
+    _$v = other as _$Value;
   }
 
   @override
-  void update(void updates(AmountBuilder b)) {
+  void update(void updates(ValueBuilder b)) {
     if (updates != null) updates(this);
   }
 
   @override
-  _$Amount build() {
-    final _$result = _$v ?? new _$Amount._(value: value, currency: currency);
+  _$Value build() {
+    final _$result = _$v ?? new _$Value._(amount: amount, currency: currency);
     replace(_$result);
     return _$result;
   }
