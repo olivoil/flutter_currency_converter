@@ -189,7 +189,15 @@ class _InputAmountValueState extends State<InputAmountValue> {
         ),
         InkWell(
           onTap: () {
-            widget.onAmountSelected(double.parse(currInput));
+            double val;
+
+            try {
+              val = double.parse(currInput);
+            } catch (e) {
+              val = 1.0;
+            }
+
+            widget.onAmountSelected(val);
 
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(

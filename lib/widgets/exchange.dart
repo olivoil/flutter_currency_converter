@@ -9,6 +9,10 @@ import 'package:currency/blocs/blocs.dart';
 import 'package:currency/models/models.dart';
 
 class Exchange extends StatelessWidget {
+  String formatNumber(double n) {
+    return n.toStringAsFixed(n.truncateToDouble() == n ? 0 : 2);
+  }
+
   @override
   Widget build(BuildContext context) {
     ExchangeBloc bloc = BlocProvider.of<ExchangeBloc>(context);
@@ -29,6 +33,35 @@ class Exchange extends StatelessWidget {
                     height: MediaQuery.of(context).size.height / 2,
                     width: MediaQuery.of(context).size.width,
                     color: Color(0xFFEC5759),
+                  ),
+                  Positioned(
+                    height: 125.0,
+                    width: 125.0,
+                    top: MediaQuery.of(context).size.height / 2 - (125.0 / 2),
+                    left: MediaQuery.of(context).size.width / 2 - (125.0 / 2),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(62.5),
+                        color: Colors.white,
+                        border: Border.all(
+                            color: Color(0xFFEC5759),
+                            style: BorderStyle.solid,
+                            width: 5.0),
+                      ),
+                      child: Center(
+                        child: state.reverse
+                            ? Icon(
+                                Icons.arrow_upward,
+                                size: 60.0,
+                                color: Color(0xFFEC5759),
+                              )
+                            : Icon(
+                                Icons.arrow_downward,
+                                size: 60.0,
+                                color: Color(0xFFEC5759),
+                              ),
+                      ),
+                    ),
                   ),
                   SafeArea(
                     child: Center(
@@ -58,33 +91,44 @@ class Exchange extends StatelessWidget {
                                   fontFamily: 'Quicksand'),
                             ),
                           ),
-                          SizedBox(height: 20.0),
+                          SizedBox(height: 30.0),
                           InkWell(
-                              onTap: () {
-                                Navigator.of(context)
-                                    .pushReplacement(MaterialPageRoute(
-                                        builder: (context) => InputAmountValue(
-                                              backgroundColor:
-                                                  Color(0xFFEC5759),
-                                              valueColor: Colors.white,
-                                              textColor: Color(0xFFF1ABAB),
-                                              onAmountSelected: (double value) {
-                                                bloc.dispatch(SetAmountA(
-                                                  amount: Amount((b) => b
-                                                    ..value = value
-                                                    ..currency =
-                                                        state.amountA.currency),
-                                                ));
-                                              },
-                                            )));
-                              },
-                              child: Text(
-                                state.amountA.value.toString(),
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 120.0,
-                                    fontFamily: 'Quicksand'),
-                              )),
+                            onTap: () {
+                              Navigator.of(context)
+                                  .pushReplacement(MaterialPageRoute(
+                                builder: (context) => InputAmountValue(
+                                      backgroundColor: Color(0xFFEC5759),
+                                      valueColor: Colors.white,
+                                      textColor: Color(0xFFF1ABAB),
+                                      onAmountSelected: (double value) {
+                                        bloc.dispatch(SetAmountA(
+                                          amount: Amount((b) => b
+                                            ..value = value
+                                            ..currency =
+                                                state.amountA.currency),
+                                        ));
+                                      },
+                                    ),
+                              ));
+                            },
+                            child: Text(
+                              formatNumber(state.amountA.value),
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 120.0,
+                                  fontFamily: 'Quicksand'),
+                            ),
+                          ),
+                          SizedBox(height: 20.0),
+                          Text(
+                            state.amountA.currency,
+                            style: TextStyle(
+                                color: Color(0xFFFFB6B6),
+                                fontSize: 17.0,
+                                fontFamily: 'Quicksand',
+                                fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 25.0),
                         ],
                       ),
                     ),

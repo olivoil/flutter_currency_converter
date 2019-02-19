@@ -42,7 +42,11 @@ class ExchangeUninitialized extends ExchangeState {
   ExchangeLoaded refreshRate({Rate rate}) {
     return ExchangeLoaded(
       rate: rate,
-      amountA: this.amountA,
+      amountA: this.amountA.value == 0.0
+          ? Amount((b) => b
+            ..value = 1.0
+            ..currency = this.amountA.currency)
+          : this.amountA,
       amountB: this.amountB,
       reverse: this.reverse,
     );
