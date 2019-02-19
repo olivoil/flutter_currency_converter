@@ -188,8 +188,6 @@ class SetValueB extends ExchangeEvent {
   SetValueB({@required this.value}) : super([value]);
 }
 
-// class ToggleReverse extends ExchangeEvent {}
-
 class ExchangeBloc extends Bloc<ExchangeEvent, ExchangeState> {
   final RatesRepository ratesRepository;
 
@@ -214,28 +212,13 @@ class ExchangeBloc extends Bloc<ExchangeEvent, ExchangeState> {
     }
 
     if (event is SetValueA) {
-      yield currentState.set(valueA: event.value);
+      yield currentState.set(valueA: event.value, reverse: false);
       this.dispatch(RefreshRates());
     }
 
     if (event is SetValueB) {
-      yield currentState.set(valueB: event.value);
+      yield currentState.set(valueB: event.value, reverse: true);
       this.dispatch(RefreshRates());
     }
-
-    // if (event is ToggleReverse) {
-    //   if (currentState is ExchangeError) {
-    //     ExchangeUninitialized state = currentState.reset();
-    //     yield state.set(reverse: !state.reverse);
-    //   }
-
-    //   if (currentState is ExchangeUninitialized) {
-    //     yield currentState.set(reverse: !currentState.reverse);
-    //   }
-
-    //   if (currentState is ExchangeLoaded) {
-    //     yield currentState.set(reverse: !currentState.reverse);
-    //   }
-    // }
   }
 }

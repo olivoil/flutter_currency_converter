@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import 'package:auto_size_text/auto_size_text.dart';
+
 import 'package:currency/widgets/exchange.dart';
 
 typedef void AmountSelectedCallback(double value);
@@ -7,13 +10,21 @@ class InputAmountValue extends StatefulWidget {
   final Color backgroundColor;
   final Color valueColor;
   final Color textColor;
+  final Color buttonBackgroundColor;
+  final Color submitButtonBackgroundColor;
+  final Color submitButtonColor;
   final AmountSelectedCallback onAmountSelected;
 
   InputAmountValue(
-      {this.backgroundColor,
+      {Key key,
+      this.backgroundColor,
       this.valueColor,
       this.textColor,
-      this.onAmountSelected});
+      this.buttonBackgroundColor,
+      this.submitButtonBackgroundColor,
+      this.submitButtonColor,
+      this.onAmountSelected})
+      : super(key: key);
 
   @override
   _InputAmountValueState createState() => _InputAmountValueState();
@@ -47,8 +58,9 @@ class _InputAmountValueState extends State<InputAmountValue> {
             ),
             SizedBox(height: 10.0),
             Center(
-              child: Text(
+              child: AutoSizeText(
                 currInput,
+                maxLines: 1,
                 style: TextStyle(
                     color: widget.valueColor,
                     fontSize: 100.0,
@@ -70,73 +82,46 @@ class _InputAmountValueState extends State<InputAmountValue> {
     );
   }
 
+  Widget valueButton(dynamic n) {
+    return button(
+        child: Text(
+          n.toString(),
+          style: TextStyle(
+              color: Colors.white, fontSize: 22.0, fontWeight: FontWeight.bold),
+        ),
+        onPressed: () {
+          calculateNumber(n);
+        });
+  }
+
+  Widget button({Widget child, VoidCallback onPressed, Color backgroundColor}) {
+    Color c = backgroundColor == null
+        ? widget.buttonBackgroundColor
+        : backgroundColor;
+
+    return SizedBox(
+      width: 80.0,
+      height: 80.0,
+      child: RaisedButton(
+        child: child,
+        onPressed: onPressed,
+        color: c,
+        elevation: 0.0,
+        highlightElevation: 0.0,
+        disabledElevation: 0.0,
+        clipBehavior: Clip.none,
+        shape: CircleBorder(),
+      ),
+    );
+  }
+
   Widget numberRow(number1, number2, number3) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
-        InkWell(
-          onTap: () {
-            calculateNumber(number1);
-          },
-          child: Container(
-            height: 80.0,
-            width: 80.0,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(40.0),
-                color: Color(0xFFB73434)),
-            child: Center(
-              child: Text(
-                number1.toString(),
-                style: TextStyle(
-                    color: widget.valueColor,
-                    fontSize: 22.0,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-        ),
-        InkWell(
-          onTap: () {
-            calculateNumber(number2);
-          },
-          child: Container(
-            height: 80.0,
-            width: 80.0,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(40.0),
-                color: Color(0xFFB73434)),
-            child: Center(
-              child: Text(
-                number2.toString(),
-                style: TextStyle(
-                    color: widget.valueColor,
-                    fontSize: 22.0,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-        ),
-        InkWell(
-          onTap: () {
-            calculateNumber(number3);
-          },
-          child: Container(
-            height: 80.0,
-            width: 80.0,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(40.0),
-                color: Color(0xFFB73434)),
-            child: Center(
-              child: Text(
-                number3.toString(),
-                style: TextStyle(
-                    color: widget.valueColor,
-                    fontSize: 22.0,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-        )
+        valueButton(number1),
+        valueButton(number2),
+        valueButton(number3),
       ],
     );
   }
@@ -145,79 +130,33 @@ class _InputAmountValueState extends State<InputAmountValue> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
-        InkWell(
-          onTap: () {
-            calculateNumber('.');
-          },
-          child: Container(
-            height: 80.0,
-            width: 80.0,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(40.0),
-                color: Color(0xFFB73434)),
-            child: Center(
-              child: Text(
-                '.',
-                style: TextStyle(
-                    color: widget.valueColor,
-                    fontSize: 22.0,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-        ),
-        InkWell(
-          onTap: () {
-            calculateNumber(0);
-          },
-          child: Container(
-            height: 80.0,
-            width: 80.0,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(40.0),
-                color: Color(0xFFB73434)),
-            child: Center(
-              child: Text(
-                0.toString(),
-                style: TextStyle(
-                    color: widget.valueColor,
-                    fontSize: 22.0,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-        ),
-        InkWell(
-          onTap: () {
-            double val;
-
-            try {
-              val = double.parse(currInput);
-            } catch (e) {
-              val = 1.0;
-            }
-
-            widget.onAmountSelected(val);
-
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => Exchange(),
-              ),
-            );
-          },
-          child: Container(
-            height: 80.0,
-            width: 80.0,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(40.0), color: Colors.white),
+        valueButton('.'),
+        valueButton(0),
+        button(
             child: Center(
                 child: Icon(
               Icons.check,
-              color: Color(0xFFFC1514),
-              size: 25.0,
+              color: widget.submitButtonColor,
+              size: 35.0,
             )),
-          ),
-        )
+            backgroundColor: widget.submitButtonBackgroundColor,
+            onPressed: () {
+              double val;
+
+              try {
+                val = double.parse(currInput);
+              } catch (e) {
+                val = 1.0;
+              }
+
+              widget.onAmountSelected(val);
+
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => Exchange(),
+                ),
+              );
+            }),
       ],
     );
   }
