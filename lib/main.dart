@@ -67,8 +67,13 @@ class AppState extends State<App> {
   Widget build(BuildContext context) {
     return BlocProvider(
       bloc: _exchangeBloc,
+      // TODO(@olivoil): use material color theme to define colors throughout the app
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primaryColor: Colors.white,
+          accentColor: Color(0xFFEC5759),
+        ),
         home: Scaffold(
           body: Exchange(),
         ),

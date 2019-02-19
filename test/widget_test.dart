@@ -9,9 +9,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:currency/repositories/repositories.dart';
 import 'package:currency/main.dart';
 
+// TODO(@olivoil): implement tests
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // TODO(@olivoil): use mock client
     final RatesRepository rateRepository = RatesRepository(
         rateApiClient: RatesApiClient(
       httpClient: http.Client(),

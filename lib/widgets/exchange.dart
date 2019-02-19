@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:intl/intl.dart';
 
 import 'package:currency/blocs/blocs.dart';
 import 'package:currency/models/models.dart';
@@ -10,10 +11,6 @@ import 'package:currency/widgets/currency_list.dart';
 import 'package:currency/widgets/input_amount_value.dart';
 
 class Exchange extends StatelessWidget {
-  String formatNumber(double n) {
-    return n.toStringAsFixed(n.truncateToDouble() == n ? 0 : 2);
-  }
-
   Widget _renderBackground(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height,
@@ -35,8 +32,8 @@ class Exchange extends StatelessWidget {
     );
   }
 
-  Widget _renderArrow(
-      BuildContext context, ExchangeBloc bloc, ExchangeState state) {
+  Widget _renderCentralIcon(BuildContext context,
+      {ExchangeBloc bloc, IconData icon}) {
     return Positioned(
       height: 125.0,
       width: 125.0,
@@ -50,20 +47,51 @@ class Exchange extends StatelessWidget {
               color: Color(0xFFEC5759), style: BorderStyle.solid, width: 5.0),
         ),
         child: Center(
-          child: (state is ExchangeLoaded && state.reverse)
-              ? Icon(
-                  Icons.arrow_upward,
-                  size: 60.0,
-                  color: Color(0xFFEC5759),
-                )
-              : Icon(
-                  Icons.arrow_downward,
-                  size: 60.0,
-                  color: Color(0xFFEC5759),
-                ),
+          child: InkWell(
+            onTap: () {
+              bloc.dispatch(RefreshRates());
+            },
+            radius: 60.0,
+            child: Icon(
+              icon,
+              size: 60.0,
+              color: Color(0xFFEC5759),
+            ),
+          ),
         ),
       ),
     );
+  }
+
+  Widget _renderArrow(
+      BuildContext context, ExchangeBloc bloc, ExchangeState state) {
+    switch (state.runtimeType) {
+      case ExchangeLoaded:
+        return _renderCentralIcon(
+          context,
+          bloc: bloc,
+          icon: (state as ExchangeLoaded).reverse
+              ? Icons.arrow_upward
+              : Icons.arrow_downward,
+        );
+
+      case ExchangeError:
+        return _renderCentralIcon(
+          context,
+          bloc: bloc,
+          icon: Icons.refresh,
+        );
+
+      case ExchangeUninitialized:
+        return _renderCentralIcon(
+          context,
+          bloc: bloc,
+          icon: null,
+        );
+
+      default:
+        return Container();
+    }
   }
 
   Widget _renderContent(
@@ -71,6 +99,13 @@ class Exchange extends StatelessWidget {
     switch (state.runtimeType) {
       case ExchangeLoaded:
         return _renderContentLoaded(context, bloc, state);
+
+      case ExchangeError:
+        return Container();
+
+      case ExchangeUninitialized:
+        return Container();
+
       default:
         return Container();
     }
@@ -136,13 +171,17 @@ class Exchange extends StatelessWidget {
                             ),
                       ));
                     },
-                    child: AutoSizeText(
-                      formatNumber(state.valueA.amount),
-                      maxLines: 1,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 120.0,
-                          fontFamily: 'Quicksand'),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 15.0, right: 15.0),
+                      child: AutoSizeText(
+                        NumberFormat.decimalPattern()
+                            .format(state.valueA.amount),
+                        maxLines: 1,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 120.0,
+                            fontFamily: 'Quicksand'),
+                      ),
                     ),
                   ),
                   SizedBox(height: 20.0),
@@ -154,7 +193,6 @@ class Exchange extends StatelessWidget {
                         fontFamily: 'Quicksand',
                         fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 25.0),
                 ],
               ),
             ),
@@ -210,22 +248,43 @@ class Exchange extends StatelessWidget {
                             ),
                       ));
                     },
-                    child: AutoSizeText(
-                      formatNumber(state.valueB.amount),
-                      maxLines: 1,
-                      style: TextStyle(
-                          color: Color(0xFFEC5759),
-                          fontSize: 120.0,
-                          fontFamily: 'Quicksand'),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 15.0, right: 15.0),
+                      child: AutoSizeText(
+                        NumberFormat.decimalPattern()
+                            .format(state.valueB.amount),
+                        maxLines: 1,
+                        style: TextStyle(
+                            color: Color(0xFFEC5759),
+                            fontSize: 120.0,
+                            fontFamily: 'Quicksand'),
+                      ),
                     ),
                   ),
                   SizedBox(height: 30.0),
-                  Text(
-                    Currency.lookup(state.valueB.currency).name,
-                    style: TextStyle(
-                        color: Color(0xFFEC5759),
-                        fontSize: 22.0,
-                        fontFamily: 'Quicksand'),
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          builder: (context) => CurrencyList(
+                                onCurrencySelected: (String symbol) {
+                                  bloc.dispatch(SetValueB(
+                                    value: Value((b) => b
+                                      ..amount = state.valueB.amount
+                                      ..currency = symbol),
+                                  ));
+                                },
+                              ),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      Currency.lookup(state.valueB.currency).name,
+                      style: TextStyle(
+                          color: Color(0xFFEC5759),
+                          fontSize: 22.0,
+                          fontFamily: 'Quicksand'),
+                    ),
                   ),
                   SizedBox(height: 25.0),
                 ],

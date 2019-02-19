@@ -213,12 +213,10 @@ class ExchangeBloc extends Bloc<ExchangeEvent, ExchangeState> {
 
     if (event is SetValueA) {
       yield currentState.set(valueA: event.value, reverse: false);
-      this.dispatch(RefreshRates());
     }
 
     if (event is SetValueB) {
       yield currentState.set(valueB: event.value, reverse: true);
-      this.dispatch(RefreshRates());
     }
   }
 }
